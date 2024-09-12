@@ -49,6 +49,7 @@ class ImageNotifier extends StateNotifier<List<ImageData>> {
     }
   }
 
+
   /// Resets the state and fetches images from the first page.
   void reset() {
     _resetPaginationAndState();
