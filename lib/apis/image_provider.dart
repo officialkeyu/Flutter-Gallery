@@ -15,13 +15,21 @@ class ImageNotifier extends StateNotifier<List<ImageData>> {
     fetchInitialImages();
   }
 
-  final Ref ref; /// Reference to the provider context.
-  int _page = 1; /// Tracks the current page of the API pagination.
-  bool _isLoading = false; /// Prevents multiple simultaneous API calls.
+  final Ref ref;
+
+  /// Reference to the provider context.
+  int _page = 1;
+
+  /// Tracks the current page of the API pagination.
+  bool _isLoading = false;
+
+  /// Prevents multiple simultaneous API calls.
 
   /// Fetches the initial set of images by loading multiple pages.
   Future<void> fetchInitialImages() async {
-    _resetPaginationAndState(); /// Reset pagination and state to initial values.
+    _resetPaginationAndState();
+
+    /// Reset pagination and state to initial values.
 
     /// Fetch multiple pages initially to populate the gallery.
     for (int i = 0; i < 3; i++) {
@@ -32,20 +40,31 @@ class ImageNotifier extends StateNotifier<List<ImageData>> {
   /// Fetches images from the Pixabay API.
   /// [isLoadMore] indicates whether to append new images or replace the current state.
   Future<void> fetchImages({bool isLoadMore = false}) async {
-    if (_isLoading) return; /// Prevent concurrent fetches.
+    if (_isLoading) return;
+
+    /// Prevent concurrent fetches.
     _isLoading = true;
 
-    final query = ref.read(searchQueryProvider); /// Read the current search query.
+    final query = ref.read(searchQueryProvider);
+
+    /// Read the current search query.
 
     try {
-      final newImages = await PixabayService().fetchImages(query: query, page: _page);
-      state = isLoadMore ? [...state, ...newImages] : newImages; /// Update state.
-      _page++; /// Increment page for next fetch.
+      final newImages =
+          await PixabayService().fetchImages(query: query, page: _page);
+      state = isLoadMore ? [...state, ...newImages] : newImages;
+
+      /// Update state.
+      _page++;
+
+      /// Increment page for next fetch.
     } catch (e) {
       /// Handle error appropriately (consider logging to an error reporting service).
       _handleError(e);
     } finally {
-      _isLoading = false; /// Reset loading flag.
+      _isLoading = false;
+
+      /// Reset loading flag.
     }
   }
 
@@ -74,6 +93,7 @@ class ImageNotifier extends StateNotifier<List<ImageData>> {
 }
 
 /// A [StateNotifierProvider] that provides an instance of [ImageNotifier].
-final imageProvider = StateNotifierProvider<ImageNotifier, List<ImageData>>((ref) {
+final imageProvider =
+    StateNotifierProvider<ImageNotifier, List<ImageData>>((ref) {
   return ImageNotifier(ref);
 });
