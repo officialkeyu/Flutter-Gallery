@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 
-
 /// A utility class for size constants.
 class SizeConstants {
-
-
- /// Font Weights
+  /// Font Weights
   static const FontWeight fontWeightExtraLight = FontWeight.w300;
   static const FontWeight fontWeightLight = FontWeight.w400;
   static const FontWeight fontWeightRegular = FontWeight.w400;
@@ -125,6 +122,5 @@ class SizeConstants {
   static double size400 = 400.0;
   static double size375 = 375.0;
   static double size665 = 665.0;
-
-
+  static double size600 = 600.0;
 }

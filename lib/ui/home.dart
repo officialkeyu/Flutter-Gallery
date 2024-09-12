@@ -3,22 +3,33 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tech_test/base/size_constants.dart';
+import 'package:tech_test/base/utils.dart';
 
+import '../apis/image_provider.dart';
 import '../base/color_constants.dart';
 import '../base/font_style.dart';
-import '../apis/image_provider.dart';
 import '../widgets/custom_textfield.dart';
-import 'image_grid.dart';
+import '../widgets/image_grid.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Home extends StatelessWidget {
+  final VoidCallback onFullScreenImage;
+
+  const Home({super.key, required this.onFullScreenImage});
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Determine the image size dynamically based on platform (example)
+    final double imageSize = screenWidth > SizeConstants.size600
+        ? SizeConstants.size100
+        : SizeConstants.size50; // Web vs Mobile
+
+    setStatusBar();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: buildCustomAppBar(),
+        appBar: buildCustomAppBar(imageSize),
         body: Consumer(
           builder: (context, ref, child) {
             final images = ref.watch(imageProvider);
@@ -29,31 +40,31 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget buildCustomAppBar() {
+  PreferredSizeWidget buildCustomAppBar(double imageSize) {
     return PreferredSize(
-      preferredSize: Size.fromHeight(SizeConstants.size80),
-      child: Container(
-        color: Colors.white,
+      preferredSize: Size.fromHeight(SizeConstants.size100),
+      child: Padding(
         padding: EdgeInsets.only(
-            top: SizeConstants.size4, right: SizeConstants.size20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          // Ensure Column takes minimal height needed
-          children: [
-            Row(
-              children: [
-                Image.asset(
-                  'assets/images/ic_pixabay_logo.png',
-                  height: SizeConstants.size60,
-                ),
-                SizedBox(
-                  width: SizeConstants.size8,
-                ),
-                const Expanded(child: SearchField()),
-              ],
-            ),
-            const Divider(thickness: 0.5, color: ColorConstants.darkGrey),
-          ],
+            left: SizeConstants.size30,
+            right: SizeConstants.size30,
+            top: SizeConstants.size14,
+            bottom: SizeConstants.size2),
+        child: SizedBox(
+          height: SizeConstants.size80, // Set the height of the row
+          width: double.infinity, // Full width
+          child: Row(
+            children: [
+              Image.asset(
+                'assets/images/ic_pixabay_logo.png',
+                height: imageSize, // Dynamic height and width based on platform
+                width: imageSize,
+              ),
+              SizedBox(width: SizeConstants.size10),
+              const Expanded(
+                child: SearchField(),
+              ),
+            ],
+          ),
         ),
       ),
     );

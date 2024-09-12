@@ -5,7 +5,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../apis/image_provider.dart';
 import '../models/image_data.dart';
-import 'full_screen_image.dart';
+import '../ui/full_screen_image.dart';
 
 /// A [StateProvider] family to manage the hover state for each image item by its ID.
 final hoverProvider = StateProvider.family<bool, int>((ref, id) => false);
@@ -18,7 +18,6 @@ class ImageGrid extends ConsumerWidget {
   /// Controller to handle scrolling within the grid view.
   final ScrollController _scrollController = ScrollController();
 
-
   ImageGrid({super.key, required this.images});
 
   @override
@@ -26,10 +25,13 @@ class ImageGrid extends ConsumerWidget {
     // Attach a listener to detect scrolling and fetch new images when necessary.
     _scrollController.addListener(() => _onScroll(ref));
 
-    final crossAxisCount = (MediaQuery.of(context).size.width / 200).floor(); // Dynamically determine number of columns based on screen width.
+    final crossAxisCount = (MediaQuery.of(context).size.width / 200)
+        .floor(); // Dynamically determine number of columns based on screen width.
 
     return MasonryGridView.count(
-      crossAxisCount: crossAxisCount,
+      crossAxisCount:
+          (MediaQuery.of(context).size.width < 600) ? 2 : crossAxisCount,
+      // Show 2 columns for mobile devices
       itemCount: images.length,
       controller: _scrollController,
       mainAxisSpacing: 8,
@@ -43,7 +45,8 @@ class ImageGrid extends ConsumerWidget {
 
   /// Handles scrolling to fetch more images when the user reaches the bottom of the grid.
   void _onScroll(WidgetRef ref) {
-    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
       ref.read(imageProvider.notifier).fetchNextPage();
     }
   }
@@ -51,7 +54,6 @@ class ImageGrid extends ConsumerWidget {
 
 /// A widget that displays an individual image item with hover effects.
 class HoverImageItem extends ConsumerWidget {
-
   final ImageData image;
 
   /// Creates a [HoverImageItem] widget for a given [ImageData].
@@ -63,7 +65,7 @@ class HoverImageItem extends ConsumerWidget {
     final isHovered = ref.watch(hoverProvider(image.id));
 
     return GestureDetector(
-      onTap: () => showFullScreenImage(context, image ),
+      onTap: () => showFullScreenImage(context, image),
       child: MouseRegion(
         onEnter: (_) => ref.read(hoverProvider(image.id).notifier).state = true,
         onExit: (_) => ref.read(hoverProvider(image.id).notifier).state = false,
@@ -81,7 +83,8 @@ class HoverImageItem extends ConsumerWidget {
                 opacity: isHovered ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 300),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.transparent, Colors.black54],
@@ -91,7 +94,8 @@ class HoverImageItem extends ConsumerWidget {
                   ),
                   child: Text(
                     image.title,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -107,8 +111,10 @@ class HoverImageItem extends ConsumerWidget {
     Navigator.push(
       context,
       PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 300), // Fast opening animation
-        reverseTransitionDuration: const Duration(milliseconds: 300), // Fast closing animation
+        transitionDuration: const Duration(milliseconds: 300),
+        // Fast opening animation
+        reverseTransitionDuration: const Duration(milliseconds: 300),
+        // Fast closing animation
         pageBuilder: (_, __, ___) => FullScreenImage(image: image),
         transitionsBuilder: (_, animation, secondaryAnimation, child) {
           return FadeTransition(
