@@ -13,6 +13,11 @@ class FontStyle {
   static final openSansSemiBoldTextColor_16 = openSansSemiBold.copyWith(
       fontSize: SizeConstants.size16, color: ColorConstants.black);
 
+
+
+  static final openSansSemiBoldTextColor_14 = openSansSemiBold.copyWith(
+      fontSize: SizeConstants.size14, color: ColorConstants.black);
+
   static const TextStyle absurdWord = TextStyle(
       fontFamily: "AbsurdWord",
       fontWeight: SizeConstants.fontWeightSemiBold,

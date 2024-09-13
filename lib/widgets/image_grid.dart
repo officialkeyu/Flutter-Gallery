@@ -1,9 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/foundation.dart'; // Import for kIsWeb
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:tech_test/base/color_constants.dart';
+import 'package:tech_test/base/font_style.dart';
 
 import '../apis/image_provider.dart';
+import '../base/size_constants.dart';
 import '../models/image_data.dart';
 import '../ui/full_screen_image.dart';
 
@@ -62,48 +66,120 @@ class HoverImageItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Observe the hover state for this specific image using its ID.
-    final isHovered = ref.watch(hoverProvider(image.id));
+    final isHovered = kIsWeb
+        ? ref.watch(hoverProvider(image.id)) // Hover on web
+        : true; // Always visible on mobile (iOS/Android)
 
     return GestureDetector(
       onTap: () => showFullScreenImage(context, image),
-      child: MouseRegion(
-        onEnter: (_) => ref.read(hoverProvider(image.id).notifier).state = true,
-        onExit: (_) => ref.read(hoverProvider(image.id).notifier).state = false,
-        child: Stack(
-          children: [
-            Hero(
-              tag: image.id,
-              child: CachedNetworkImage(imageUrl: image.url),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: AnimatedOpacity(
-                opacity: isHovered ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 300),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.transparent, Colors.black54],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  ),
-                  child: Text(
-                    image.title,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+      child: kIsWeb
+          ? MouseRegion(
+              onEnter: (_) =>
+                  ref.read(hoverProvider(image.id).notifier).state = true,
+              onExit: (_) =>
+                  ref.read(hoverProvider(image.id).notifier).state = false,
+              child: _buildStack(context, isHovered, image),
+            )
+          : _buildStack(context, isHovered, image), // No hover on mobile
+    );
+  }
+
+  /// Builds the stack for the image and its hover effects.
+  Widget _buildStack(BuildContext context, bool isHovered, ImageData image) {
+    return Stack(
+      children: [
+        Hero(
+          tag: image.id,
+          child: CachedNetworkImage(imageUrl: image.url),
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: AnimatedOpacity(
+            opacity: isHovered ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 300),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                  vertical: SizeConstants.size8,
+                  horizontal: SizeConstants.size16),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.transparent, Colors.black54],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
               ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.favorite,
+                            color: Colors.white,
+                            size: SizeConstants.size16,
+                          ),
+                          SizedBox(width: SizeConstants.size4),
+                          Text(
+                            '${image.likes}', // Like count dynamically
+                            style: FontStyle.openSansSemiBoldTextColor_14
+                                .copyWith(color: ColorConstants.white),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: SizeConstants.size16),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.remove_red_eye,
+                            color: Colors.white,
+                            size: SizeConstants.size16,
+                          ),
+                          SizedBox(width: SizeConstants.size4),
+                          Text(
+                            '${image.views}', // View count dynamically
+                            style: FontStyle.openSansSemiBoldTextColor_14
+                                .copyWith(color: ColorConstants.white),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
-      ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: AnimatedOpacity(
+            opacity: isHovered ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 300),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.transparent, Colors.black54],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: Text(
+                image.title,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
