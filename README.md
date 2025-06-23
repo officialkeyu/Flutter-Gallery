@@ -43,9 +43,9 @@ This Android application was built as part of a mobile development assessment. I
 - **Tools**: Android Studio Meerkat Feature Drop | 2024.3.2 Patch 1
 
 API Reference
-GET http://18.208.147.119/events – Get all events (with pagination)
-GET http://18.208.147.119/events/:id – Get event by ID
-GET http://18.208.147.119/event-categories - Get event categories for filter
+- **GET** http://18.208.147.119/events – Get all events (with pagination)
+- **GET** http://18.208.147.119/events/:id – Get event by ID
+- **GET** http://18.208.147.119/event-categories - Get event categories for filter
 
 
 
